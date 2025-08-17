@@ -15,5 +15,5 @@ export const userStore = configureStore({
 export type UserState = ReturnType<typeof userStore.getState>;
 export type UserDispatch = typeof userStore.dispatch;
 
-export const useUserDispatch: () => UserDispatch = useDispatch;
-export const useUserSelector: TypedUseSelectorHook<UserState> = useSelector;
+export const useStoreDispatch: () => UserDispatch = useDispatch;
+export const useStoreSelector: TypedUseSelectorHook<UserState> = useSelector;

@@ -1,17 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { UserState } from "../reducer/user.reducer";
-import Button from "../components/Button";
+import { Button } from "@/components/ui/button";
 import api from "../axios";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import type { UserDispatch } from "../store/user.store";
+// import { useDispatch } from "react-redux";
+import { useStoreDispatch ,useStoreSelector} from "../store/store";
 import { login } from "../reducer/user.reducer";
 // import React from 'react'
 
 
 const Login = () => {
   const navigate = useNavigate();
-  const userDispatch = useDispatch<UserDispatch>();
+  const storeDispatch = useStoreDispatch();
+  const storeSelector = useStoreSelector(state => state.user)
+  useEffect(() => {
+    console.log(storeSelector)
+    if(storeSelector.userId){
+      navigate('/')
+    }
+  },[])
+
+
+
 
   const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
@@ -31,11 +41,13 @@ const Login = () => {
           userId:res.data.user._id
         } ;
         
-        userDispatch(login(data));
+        storeDispatch(login(data));
         navigate("/");
       }
     } catch (error) {}
   };
+
+
   return (
     <>
       <div className="w-full  h-full">
@@ -67,7 +79,7 @@ const Login = () => {
             type="text"
             className="bg-[var(--primary-foreground)] opacity-55 p-1 w-full rounded-3xl ps-3 focus:outline-[var(--secondary-foreground)] focus:ring-0"
           />
-          <Button buttonType="secondary" className="mt-3" onClick={handleLogin}>
+          <Button variant={"destructive"} className="mt-3" onClick={handleLogin}>
             login
           </Button>
         </div>

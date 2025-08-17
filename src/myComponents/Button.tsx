@@ -13,10 +13,10 @@ const customStyle  = {
 }
 
 
-const Button = ({children,buttonType,className = "",...rest}:ButtonProps) => {
+const myButton = ({children,buttonType,className = "",...rest}:ButtonProps) => {
   return (
     <button className={`${customStyle[buttonType]+ " " + className}`} {...rest}>{children}</button>
   )
 }
 
-export default Button
+export default myButton

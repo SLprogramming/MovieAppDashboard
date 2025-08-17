@@ -2,27 +2,33 @@
 import { Suspense, useEffect } from "react";
 import {routes} from "./route.tsx"
 import { BrowserRouter, useRoutes } from "react-router-dom"
-import { useUserDispatch } from "./store/user.store.ts";
+import { useStoreDispatch } from "./store/store.ts";
 import { checkAuth } from "./reducer/user.reducer.ts";
+import Loading from "./pages/Loading.tsx";
+
+
 
 
 function App() {
-const userDispatch = useUserDispatch()
 
-useEffect(() => {
-  userDispatch(checkAuth())
-},[userDispatch])
+const dispatch = useStoreDispatch()
+  useEffect(() => {
+    dispatch(checkAuth())
+  },[dispatch])
   function AppRoutes() {
   return useRoutes(routes);
 }
 
   return (
     <>
+    <div  className="bg-[var(--light-color)]">
+
       <BrowserRouter>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Loading></Loading>}>
         <AppRoutes />
       </Suspense>
     </BrowserRouter>
+    </div>
     </>
   )
 }

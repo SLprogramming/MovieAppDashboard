@@ -26,19 +26,36 @@ const initialState: UserState = {
 };
 
 
+
 // ✅ Async thunk to check auth
 export const checkAuth = createAsyncThunk(
   "user/checkAuth",
-  async () => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) return initialState;
+  async (_, { getState, rejectWithValue }) => {
+    const state: any = getState(); // type properly if you have RootState
 
-    // call API with userId
-    const response = await api.get(`auth/info`);
-    console.log(response.data)
-    return response.data; // must match UserState shape
+    // check if user already exists in state
+    if (state.user?.userId) {
+      console.log("Already have user in state:", state.user);
+      return state.user; // return existing data, skip API
+    }
+
+    // // fallback check: localStorage
+    // const userId = localStorage.getItem("userId");
+    // if (!userId) {
+    //   console.log("No userId found, returning initial state");
+    //   return rejectWithValue("No userId");
+    // }
+
+    try {
+      // 🔥 Only call API if no data in state
+      const response = await api.get("auth/info");
+      return response.data;
+    } catch (err) {
+      return rejectWithValue("Auth check failed");
+    }
   }
 );
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -53,21 +70,28 @@ const userSlice = createSlice({
     //   state.value += action.payload;
     // },
     login(_, action: PayloadAction<UserState>) {
-      localStorage.setItem('userId',action.payload.userId)
+      // localStorage.setItem('userId',action.payload.userId)
       return action.payload;  
     },
     logout() {
-      localStorage.removeItem('userId')
+      // localStorage.removeItem('userId')
       return initialState
     },
    
   },
   extraReducers:(builder) => {
       builder.addCase(checkAuth.fulfilled,(_,action) => {
-        console.log(action.payload)
+        let data = {
+          name: action.payload?.user?.name,
+          email: action.payload?.user?.email,
+          premiumExpire: action.payload?.user?.premiumExpire,
+          role: action.payload?.user?.role,
+          userId:action.payload?.user?._id
+        }
+        return data
       })
   },
 });
 
-export const { login } = userSlice.actions;
+export const { login, logout } = userSlice.actions;
 export default userSlice.reducer;
