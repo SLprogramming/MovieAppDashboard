@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+*{
+  /* margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth; */
+}
+
+
+:root{
+  --primary-color:#8ecae6;
+  --secondary-color:#023047;
+  --light-color:#dee2db;
+  --lightGray-color:#343631;
+  --secondary-foreground:#252525;
+  --primary-foreground:#219ebc;
+}
+
+html{
+  background-color: var(--light-color);
+  color:rgb(0, 0, 0) ;
+  
+}
+
+#root{
+  width: 100%;
+  height: 100vh;
+}
