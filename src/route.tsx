@@ -1,9 +1,11 @@
 // routes.tsx
 import { lazy } from "react";
-import { Navigate, type RouteObject } from "react-router-dom";
-import { AuthRedirect, RedirectToLogin } from "./protectRoute.tsx";
+import {  type RouteObject } from "react-router-dom";
+import { AuthRedirect, IndexRedirect } from "./protectRoute.tsx";
 import Users from "./pages/Users.tsx";
 import PurchaseRequest from "./pages/PurchaseRequest.tsx";
+import Plans from "./pages/Plans.tsx";
+import Index from "./pages/Index.tsx";
 
 const Home = lazy(() => import("./pages/Home.tsx"));
 const Login = lazy(() => import("./pages/Login.tsx"));
@@ -24,13 +26,34 @@ export const routes: RouteObject[] = [
   
     ),
     children:[
-      {index:true,element:<Users/>},
-      {path:'/purchase',element:<PurchaseRequest/>}
+      {index:true,element:(
+    <AuthRedirect redirectTo="/users">
+
+    <Index />
+    </AuthRedirect>)},
+      {path:"/users",element:(
+      <IndexRedirect redirectTo="/">
+
+        <Users/>
+      </IndexRedirect>
+    )},
+      {path:'/purchase',element:(
+      <IndexRedirect redirectTo="/">
+
+        <PurchaseRequest/>
+      </IndexRedirect>
+    )},
+      {path:'/plans',element:(
+      <IndexRedirect redirectTo="/">
+
+      <Plans/>
+      </IndexRedirect>
+    )},
     ]
   },
   { path: "/login", element: (
   
-    <AuthRedirect redirectTo="/">
+    <AuthRedirect redirectTo="/users">
 
     <Login />
     </AuthRedirect>

@@ -1,4 +1,4 @@
-import { Calendar, Users, Inbox, Search, Settings } from "lucide-react"
+import { Gem , Users, TicketCheck, CreditCard,  Settings } from "lucide-react"
 
 import {
   Sidebar,
@@ -16,34 +16,39 @@ import { Link } from "react-router-dom"
 const items = [
   {
     title: "Users",
-    url: "/purchase",
+    url: "/users",
     icon:Users,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
+    title: "Purchase",
+    url: "/purchase",
+    icon: TicketCheck,
   },
   {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
+    title: "Plans",
+    url: "/plans",
+    icon: Gem ,
   },
   {
-    title: "Search",
+    title: "Payment",
     url: "#",
-    icon: Search,
+    icon: CreditCard ,
   },
+  // {
+  //   title: "Notification",
+  //   url: "#",
+  //   icon: Bell ,
+  // },
   {
-    title: "Settings",
+    title: "Setting",
     url: "#",
-    icon: Settings,
+    icon: Settings ,
   },
 ]
 
 export function AppSidebar() {
   return (
-    <Sidebar variant="floating">
+    <Sidebar variant="floating" collapsible="icon" >
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>

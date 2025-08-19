@@ -5,7 +5,8 @@ import { BrowserRouter, useRoutes } from "react-router-dom"
 import { useStoreDispatch } from "./store/store.ts";
 import { checkAuth } from "./reducer/user.reducer.ts";
 import Loading from "./pages/Loading.tsx";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -21,8 +22,8 @@ const dispatch = useStoreDispatch()
 
   return (
     <>
-    <div  className="bg-[var(--light-color)]">
-
+    <div  className="">
+    <ToastContainer/>
       <BrowserRouter>
       <Suspense fallback={<Loading></Loading>}>
         <AppRoutes />

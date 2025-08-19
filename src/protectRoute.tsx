@@ -25,7 +25,7 @@ export const AuthRedirect = ({ children ,redirectTo}: ProtectedRouteProps) => {
   // Logged in → render the child component
   return <>{children}</>;
 };
-export const RedirectToLogin = ({ children ,redirectTo}: ProtectedRouteProps) => {
+export const IndexRedirect = ({ children,redirectTo }: ProtectedRouteProps) => {
     
     const {userId} = useStoreSelector(state => state.user)
 

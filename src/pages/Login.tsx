@@ -14,7 +14,7 @@ const Login = () => {
   const storeDispatch = useStoreDispatch();
   const storeSelector = useStoreSelector(state => state.user)
   useEffect(() => {
-    console.log(storeSelector)
+
     if(storeSelector.userId){
       navigate('/')
     }
@@ -30,7 +30,7 @@ const Login = () => {
     try {
       let payload = { email: emailInput, password: passwordInput };
       let res = await api.post("/auth/login", payload);
-      console.log("response data:", res);
+    
       if(res.data.success){
 
         let data :UserState= {
