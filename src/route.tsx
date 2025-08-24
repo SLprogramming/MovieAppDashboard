@@ -6,6 +6,7 @@ import Users from "./pages/Users.tsx";
 import PurchaseRequest from "./pages/PurchaseRequest.tsx";
 import Plans from "./pages/Plans.tsx";
 import Index from "./pages/Index.tsx";
+import Payment from "./pages/Payment.tsx";
 
 const Home = lazy(() => import("./pages/Home.tsx"));
 const Login = lazy(() => import("./pages/Login.tsx"));
@@ -47,6 +48,12 @@ export const routes: RouteObject[] = [
       <IndexRedirect redirectTo="/">
 
       <Plans/>
+      </IndexRedirect>
+    )},
+      {path:'/payment',element:(
+      <IndexRedirect redirectTo="/">
+
+      <Payment/>
       </IndexRedirect>
     )},
     ]

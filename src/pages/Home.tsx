@@ -11,6 +11,7 @@ import { AppSidebar } from "@/myComponents/app-sidebar";
 import { Outlet } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
+import { toast } from "react-toastify";
 
 
 
@@ -18,10 +19,12 @@ import { LogOut } from "lucide-react";
 const Home = () => {
 const dispatch = useStoreDispatch()
   const {name} = useStoreSelector((state) => state.user)
-  const handleLogout =async () => {
+ const handleLogout =async () => {
     let res = await api.get('auth/logout')
-   
-    dispatch(logout())
+    if(res.data.success){
+      toast.success('successfully logout',{autoClose:2000,position:"top-center"})
+      dispatch(logout())
+    }
 
   }
   useEffect(() => {

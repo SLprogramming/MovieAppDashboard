@@ -21,19 +21,23 @@ import { Button } from "@/components/ui/button"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  handlePaginate?:(flag:"prev" | "next") => void
+  handlePaginate?:(flag:"prev" | "next") => void,
+  conditionForNoResultButton?:boolean,
+  handleButton?:() => void,
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  handlePaginate
+  handlePaginate,
+  conditionForNoResultButton,
+  handleButton
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     
   })
 
@@ -41,6 +45,7 @@ export function DataTable<TData, TValue>({
     <div>
 
     <div className="overflow-hidden rounded-md border">
+      
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -60,6 +65,8 @@ export function DataTable<TData, TValue>({
             </TableRow>
           ))}
         </TableHeader>
+       
+
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
@@ -77,11 +84,16 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                <div>
+
+                No results. {conditionForNoResultButton ?'You can delete this type' : ''}
+                </div>
+                {conditionForNoResultButton && <Button variant={"destructive"} onClick={handleButton}>Delete</Button>}
               </TableCell>
             </TableRow>
           )}
         </TableBody>
+     
       </Table>
     </div>
   {handlePaginate && (  <div className="flex items-center justify-end space-x-2 py-4">

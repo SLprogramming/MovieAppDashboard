@@ -2,6 +2,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "../reducer/user.reducer.ts";
 import planReducer from "../reducer/plan.reducer.ts"
+import paymentTypeReducer from "../reducer/payment.reducer.ts"
+import accountReducer from "../reducer/account.reducer.ts"
 
 import {type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
@@ -9,7 +11,9 @@ import {type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
 export const userStore = configureStore({
   reducer: {
     user: userReducer,
-    plan:planReducer
+    plan:planReducer,
+    payment:paymentTypeReducer,
+    account:accountReducer,
   },
 });
 

@@ -40,6 +40,11 @@ export const getUserColumns = (plans : SubscriptionPlan[],onUpdateUser : (user: 
 
      const userColumns: ColumnDef<User>[] = [
       {
+    id: "serial",
+    header: "#",
+    cell: ({ row }) => row.index + 1, // serial number starts at 1
+  },
+      {
         accessorKey: "name",
         header: "Name",
       },
@@ -48,7 +53,7 @@ export const getUserColumns = (plans : SubscriptionPlan[],onUpdateUser : (user: 
         header: "Email",
       },
       {
-        accessorKey: "premiumExpireStatus",
+        accessorKey: "ExpireStatus",
         header: "Premium",
         cell: ({ row }) => {
           let data = row.getValue("premiumExpire") as string;
@@ -68,6 +73,11 @@ export const getUserColumns = (plans : SubscriptionPlan[],onUpdateUser : (user: 
             );
           }
         },
+      },
+      {
+        accessorKey: "role",
+        header: "Role",
+        
       },
       {
         accessorKey: "premiumExpire",
@@ -92,11 +102,12 @@ export const getUserColumns = (plans : SubscriptionPlan[],onUpdateUser : (user: 
         enableHiding: false,
         cell: ({ row }) => {
           const userId = row.getValue("_id") as string;
+          const role =row.getValue("role") as string
     
           return (
             <div>
               
-              <UserRowActions userId={userId} plans={plans} onUpdateUser={onUpdateUser} />
+              <UserRowActions userId={userId} plans={plans} onUpdateUser={onUpdateUser} role={role}/>
             </div>
           );
         },

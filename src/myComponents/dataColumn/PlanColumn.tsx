@@ -4,17 +4,21 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+import {  buttonVariants } from "@/components/ui/button"
 import { Ellipsis } from "lucide-react"
 
+ 
 
-
-export const getPlanColumn = () => {
+export const getPlanColumn = (handleDeletePlan:(id:string) => void, setSelectedIdToEdit : (id:string) => void,selectedIdToEdit:string)  => {
      const columns: ColumnDef<SubscriptionPlan>[] = [
+      {
+    id: "serial",
+    header: "#",
+    cell: ({ row }) => row.index + 1, // serial number starts at 1
+  },
   {
     accessorKey: "name",
     header: "Name",
@@ -26,6 +30,14 @@ export const getPlanColumn = () => {
   {
     accessorKey: "currency",
     header: "Currency",
+  },
+  {
+    accessorKey: "durationDays",
+    header: "Days",
+    cell:({row}) => {
+      let days : number = row.getValue('durationDays')
+      return <div>{days}</div>
+    }
   },
   {
     accessorKey: "description",
@@ -43,15 +55,19 @@ export const getPlanColumn = () => {
     accessorKey: "_id",
     header: "Actions",
     cell:({row}) => {
+      const planId = row.getValue("_id") as string
         return (
             <DropdownMenu>
-  <DropdownMenuTrigger ><Button variant="outline" size="icon">
+  <DropdownMenuTrigger >
+    <div className={buttonVariants({variant:selectedIdToEdit == planId ? "default" : "outline"})}>
+
           <Ellipsis className="h-4 w-4" />
-        </Button></DropdownMenuTrigger>
+    </div>
+        </DropdownMenuTrigger>
   <DropdownMenuContent>
    
-    <DropdownMenuItem>Delete</DropdownMenuItem>
-    <DropdownMenuItem>Edit</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => handleDeletePlan(planId)}>Delete</DropdownMenuItem>
+    <DropdownMenuItem onClick={() => setSelectedIdToEdit(planId)}>Edit</DropdownMenuItem>
     <DropdownMenuItem>Deactivate</DropdownMenuItem>
     
   </DropdownMenuContent>

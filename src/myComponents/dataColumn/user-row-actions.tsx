@@ -2,9 +2,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+
   DropdownMenuPortal,
+
   DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
 import { Ellipsis } from "lucide-react";
 import {
@@ -27,17 +29,33 @@ import {
 import { useEffect, useState } from "react";
 import api from "@/axios";
 import { toast } from "react-toastify";
+import { useStoreSelector } from "@/store/store";
 
 type UserRowActionsType = {
   userId: string;
   plans: SubscriptionPlan[];
   onUpdateUser:(user:User) => void;
+  role:string
 };
 
-const UserRowActions = ({ userId, plans ,onUpdateUser }: UserRowActionsType) => {
+const UserRowActions = ({ userId, plans ,onUpdateUser ,role}: UserRowActionsType) => {
 
   const [selectedDay, setSelectedDay] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
+  const userState = useStoreSelector(state => state.user)
+
+  const handlePromote = async (role : string) => {
+    try {
+
+      let res = await api.put('user/promote/'+userId,{role})
+      if(res.data.success){
+        toast.success('successfully change user role',{autoClose:2000,position:"top-center"})
+        onUpdateUser(res.data.user)
+      }
+    } catch (error) {
+      
+    }
+  }
 
   useEffect(() => {
     
@@ -92,7 +110,7 @@ const UserRowActions = ({ userId, plans ,onUpdateUser }: UserRowActionsType) => 
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full text-left font-bold"
+                  className="w-full text-left "
                 >
                   Extend Premium
                 </Button>
@@ -156,12 +174,14 @@ const UserRowActions = ({ userId, plans ,onUpdateUser }: UserRowActionsType) => 
             </Popover>
           </DropdownMenuItem>
 
-          <DropdownMenuItem className="rounded-xl font-bold ps-2 pe-4 py-1 my-2 hover:bg-red-600 hover:text-white">
+           {userState.role == "superAdmin" && (<>
+           {/* <DropdownMenuItem className="my-2">
             Delete
+          </DropdownMenuItem> */}
+         <DropdownMenuItem className="my-2" onClick={() => handlePromote( role == "user" ? "admin" : "user")} >
+            {role == "user" ? "Promote Admin" : "Depromote User"}
           </DropdownMenuItem>
-          <DropdownMenuItem className="rounded-xl select-none ps-2 pe-4 py-1 my-2 hover:bg-yellow-400 font-bold">
-            Deactivate
-          </DropdownMenuItem>
+           </>)}
         </DropdownMenuContent>
       </DropdownMenuPortal>
     </DropdownMenu>

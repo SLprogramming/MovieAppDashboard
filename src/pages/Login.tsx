@@ -5,7 +5,8 @@ import api from "../axios";
 import { useNavigate } from "react-router-dom";
 // import { useDispatch } from "react-redux";
 import { useStoreDispatch ,useStoreSelector} from "../store/store";
-import { login } from "../reducer/user.reducer";
+import { login, logout } from "../reducer/user.reducer";
+import { toast } from "react-toastify";
 // import React from 'react'
 
 
@@ -13,6 +14,16 @@ const Login = () => {
   const navigate = useNavigate();
   const storeDispatch = useStoreDispatch();
   const storeSelector = useStoreSelector(state => state.user)
+
+  const handleLogout =async () => {
+    let res = await api.get('auth/logout')
+    if(res.data.success){
+toast.success('successfully logout',{autoClose:2000,position:"top-center"})
+      storeDispatch(logout())
+    }
+
+  }
+
   useEffect(() => {
 
     if(storeSelector.userId){
@@ -30,7 +41,10 @@ const Login = () => {
     try {
       let payload = { email: emailInput, password: passwordInput };
       let res = await api.post("/auth/login", payload);
-    
+      if(res.data.user.role == "user"){
+handleLogout()
+       return toast.error('user account not allow to login',{position:"top-center",autoClose:2000})
+      }
       if(res.data.success){
 
         let data :UserState= {
@@ -40,7 +54,7 @@ const Login = () => {
           role: res.data.user.role,
           userId:res.data.user._id
         } ;
-        
+        toast.success('login success',{autoClose:2000,position:"top-center"})
         storeDispatch(login(data));
         navigate("/");
       }
