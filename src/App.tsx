@@ -7,14 +7,21 @@ import { checkAuth } from "./reducer/user.reducer.ts";
 import Loading from "./pages/Loading.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAdminSocket } from "./socket.tsx";
+import { fetchAllPurchase } from "./reducer/purchase.reducer.ts";
 
 
 
 function App() {
-
-const dispatch = useStoreDispatch()
+  const dispatch = useStoreDispatch()
+ 
+  const newRequestPurchase = () => {
+    dispatch(fetchAllPurchase())
+  }
+useAdminSocket(newRequestPurchase)
   useEffect(() => {
     dispatch(checkAuth())
+    dispatch(fetchAllPurchase())
   },[dispatch])
   function AppRoutes() {
   return useRoutes(routes);

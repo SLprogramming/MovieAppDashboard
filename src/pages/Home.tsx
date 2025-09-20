@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 
 const Home = () => {
 const dispatch = useStoreDispatch()
-  const {name} = useStoreSelector((state) => state.user)
+  const {name,role} = useStoreSelector((state) => state.user)
  const handleLogout =async () => {
     let res = await api.get('auth/logout')
     if(res.data.success){
@@ -28,9 +28,11 @@ const dispatch = useStoreDispatch()
 
   }
   useEffect(() => {
-  
+  if(role == 'user'){
+    handleLogout()
+  }
     
-  },[name])
+  },[role])
   return (
     <>
     
