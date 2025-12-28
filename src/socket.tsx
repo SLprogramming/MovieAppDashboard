@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { io, type Socket } from "socket.io-client";
 
 // single socket instance
-const socket: Socket = io("http://192.168.110.131:8000");
+const socket: Socket = io("http://192.168.110.134:8000");
 // const socket: Socket = io("https://movieappbackend-lc3u.onrender.com");
 export const useAdminSocket = (onNewRequest: (data: any) => void) => {
   useEffect(() => {
