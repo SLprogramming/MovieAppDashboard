@@ -1,4 +1,4 @@
-import { Gem , Users, TicketCheck, CreditCard,  Settings } from "lucide-react"
+import { Gem , Users, TicketCheck, CreditCard,  Settings ,MessageCircleMore } from "lucide-react"
 
 import {
   Sidebar,
@@ -15,13 +15,14 @@ import { Badge } from "@/components/ui/badge"
 import { useStoreSelector } from "@/store/store"
 import { useMemo } from "react"
 
-type SidebarTitle = "Users" | "Purchase" | "Plans" | "Payment" | "Setting";
+type SidebarTitle = "Users" | "Purchase" | "Plans" | "Payment" | "Setting" | "Message";
 
 const items: { title: SidebarTitle; url: string; icon: any }[] = [
   { title: "Users", url: "/users", icon: Users },
   { title: "Purchase", url: "/purchase", icon: TicketCheck },
   { title: "Plans", url: "/plans", icon: Gem },
   { title: "Payment", url: "/payment", icon: CreditCard },
+  { title: "Message", url: "/message", icon: MessageCircleMore },
   { title: "Setting", url: "#", icon: Settings },
 ];
 
@@ -35,6 +36,7 @@ const badge: Record<SidebarTitle, number> = useMemo(() => {
     Plans: 0,
     Payment: 0,
     Setting: 0,
+    Message: 0,
   };
 }, [purchaseHistory]);
 

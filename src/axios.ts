@@ -3,7 +3,7 @@ import type {AxiosInstance, AxiosRequestConfig, AxiosResponse} from "axios"
 
 const api: AxiosInstance = axios.create({
   // baseURL: "https://movieappbackend-lc3u.onrender.com/api/",
-  baseURL: "http://192.168.110.134:8000/api/",
+  baseURL: "http://192.168.110.124:8000/api/",
   timeout: 10000,
   withCredentials: true, // cookies included automatically
   headers: {

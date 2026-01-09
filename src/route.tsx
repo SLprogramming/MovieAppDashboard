@@ -7,7 +7,7 @@ import PurchaseRequest from "./pages/PurchaseRequest.tsx";
 import Plans from "./pages/Plans.tsx";
 import Index from "./pages/Index.tsx";
 import Payment from "./pages/Payment.tsx";
-
+import Message from "./pages/AdminChatUI.tsx";
 const Home = lazy(() => import("./pages/Home.tsx"));
 const Login = lazy(() => import("./pages/Login.tsx"));
 // const About = lazy(() => import("./pages/About"));
@@ -48,6 +48,12 @@ export const routes: RouteObject[] = [
       <IndexRedirect redirectTo="/">
 
       <Plans/>
+      </IndexRedirect>
+    )},
+      {path:'/message',element:(
+      <IndexRedirect redirectTo="/">
+
+      <Message/>
       </IndexRedirect>
     )},
       {path:'/payment',element:(

@@ -5,6 +5,7 @@ import planReducer from "../reducer/plan.reducer.ts"
 import paymentTypeReducer from "../reducer/payment.reducer.ts"
 import accountReducer from "../reducer/account.reducer.ts"
 import PurchaseHistorySlice from "../reducer/purchase.reducer.ts"
+import MessageSlice from "../reducer/message.reducer.ts"
 
 import {type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
@@ -16,6 +17,7 @@ export const userStore = configureStore({
     payment:paymentTypeReducer,
     account:accountReducer,
     purchase:PurchaseHistorySlice,
+    message:MessageSlice
   },
 });
 
