@@ -31,7 +31,7 @@ export type MessageStatus = "sending" | "sent" | "seen";
 export interface IMessage {
   _id: string;
 
-  sender_id: string | IUser;          // ObjectId string
+  sender_id: IUser;          // ObjectId string
   conversation_id: string;    // ObjectId string
 
   status: MessageStatus;
@@ -73,6 +73,28 @@ export const fetchAllConversation = createAsyncThunk("accounts/fetchAllConversat
 
 })
 
+export const fetchConversationByUserId = createAsyncThunk("accounts/fetchConversationByUserId", async (userId: string, { getState, rejectWithValue }) => {
+
+  try {
+    const response = await liveChatApi.get(`conversations/get-by-user/${userId}`);
+    return response?.data?.conversations;
+  } catch (error) {
+    return rejectWithValue("Auth check failed");
+  }
+
+})
+
+export const fetchAllMessagesByUserId = createAsyncThunk("accounts/fetchAllMessagesByUserId", async (userId: string, { getState, rejectWithValue }) => {
+
+  try {
+    const response = await liveChatApi.get(`messages/get-messages-by-user/${userId}`);
+    console.log(response?.data)
+    return response?.data?.messages;
+  } catch (error) {
+    return rejectWithValue("Auth check failed");
+  }
+})
+
 const MessageSlice = createSlice({
   name: "messages",
   initialState,
@@ -102,6 +124,12 @@ const MessageSlice = createSlice({
     builder.addCase(fetchAllConversation.fulfilled, (state, action) => {
       state.newConversation = action.payload;
     }); 
+    builder.addCase(fetchConversationByUserId.fulfilled,(state,action) => {
+      state.conversations = action.payload
+    });
+    builder.addCase(fetchAllMessagesByUserId.fulfilled,(state,action) => {
+      state.messages = action.payload
+    });
 }});
 
 export const { setConversations,setMessages,deleteConversation,addMessage,addConversation } = MessageSlice.actions;
