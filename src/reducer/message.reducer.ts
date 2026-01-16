@@ -30,7 +30,7 @@ export type MessageStatus = "sending" | "sent" | "seen";
 
 export interface IMessage {
   _id: string;
-
+  client_id:string;
   sender_id: IUser;          // ObjectId string
   conversation_id: string;    // ObjectId string
 
