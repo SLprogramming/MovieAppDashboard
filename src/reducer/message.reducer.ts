@@ -1,6 +1,7 @@
 import {  createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import liveChatApi from "../liveChatAxios.ts"
+import { formatApiResponseMessage } from "@/lib/utils.ts";
 
 
 export interface IUser {
@@ -43,12 +44,21 @@ export interface IMessage {
   __v?: number;
 }
 
+export type ChatMessage = {
+  conversation_id:string;
+  id: string | null;
+  text?: string;
+  fileName: string | null;
+  sender_id:string; // extend if needed
+  timestamp: string;
+  status:MessageStatus
+};
 
 
 type InitialStateType ={
     conversations: IConversation[]
     newConversation: IConversation[]
-    messages:IMessage[]
+    messages:ChatMessage[]
 }
 
 const initialState: InitialStateType = {
@@ -102,7 +112,7 @@ const MessageSlice = createSlice({
     setConversations(state, action: PayloadAction<IConversation[]>) {
       state.conversations = action.payload;
     },
-    setMessages(state, action: PayloadAction<IMessage[]>) {
+    setMessages(state, action: PayloadAction<ChatMessage[]>) {
       state.messages = action.payload;
     },
     deleteConversation(state, action: PayloadAction<{id:string,isNew:boolean}>) {
@@ -113,7 +123,7 @@ const MessageSlice = createSlice({
        }
       
     },
-    addMessage(state, action: PayloadAction<IMessage>) {
+    addMessage(state, action: PayloadAction<ChatMessage>) {
       state.messages.push(action.payload);
     },
     addConversation(state, action: PayloadAction<IConversation>) {
@@ -128,7 +138,7 @@ const MessageSlice = createSlice({
       state.conversations = action.payload
     });
     builder.addCase(fetchAllMessagesByUserId.fulfilled,(state,action) => {
-      state.messages = action.payload
+      state.messages = formatApiResponseMessage(action.payload)
     });
 }});
 

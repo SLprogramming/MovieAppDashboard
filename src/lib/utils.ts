@@ -1,6 +1,11 @@
+import type { ChatMessage, IMessage } from "@/reducer/message.reducer";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { v4 as uuidv4 } from "uuid";
 
+export function generateUniqueId(): string {
+  return `${Date.now()}-${uuidv4()}`;
+}
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -47,4 +52,16 @@ export function formatChatTime(isoDate: string): string {
   // Years ago
   const diffYears = now.getFullYear() - date.getFullYear();
   return `${diffYears} year${diffYears > 1 ? "s" : ""} ago`;
+}
+
+export const formatApiResponseMessage = (messages:IMessage[])  : ChatMessage[] => {
+ return messages.map((item ) => ({
+        conversation_id:item?.conversation_id,
+        id:item?._id,
+        text:item?.message,
+        fileName:item?.file?.publicID || null,
+        sender_id:item?.sender_id?._id ,
+        timestamp:item?.createdAt,
+        status:"sending"
+      }))
 }

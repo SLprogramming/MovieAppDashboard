@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Send, Paperclip, Search, MoreHorizontal, CheckCheck, FileText, X } from 'lucide-react';
 import {messageSocket} from "../socket.tsx"
-import {deleteConversation, fetchAllConversation, fetchAllMessagesByUserId, fetchConversationByUserId} from '../reducer/message.reducer.ts';
+import {deleteConversation, fetchAllConversation, fetchAllMessagesByUserId, fetchConversationByUserId,addMessage, type ChatMessage} from '../reducer/message.reducer.ts';
 import { useStoreDispatch,useStoreSelector } from '@/store/store.ts';
-import { formatChatTime } from '@/lib/utils.ts';
+import { formatApiResponseMessage, formatChatTime, generateUniqueId } from '@/lib/utils.ts';
 
 
 
@@ -40,6 +40,10 @@ const AdminChatUI = () => {
     console.log('Setting up message socket listeners');
     messageSocket.on("message:new",(data:any) => {
       console.log("New message received:",data)
+      formatApiResponseMessage([data]).map(e=>{
+        dispatch(addMessage(e))
+      })
+
     })
     messageSocket.on("conversation:new",(data:any) => {
       console.log("New conversation:",data)
@@ -73,7 +77,18 @@ const AdminChatUI = () => {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() && !selectedFile) return;
-
+       const client_id = generateUniqueId()
+       messageSocket.emit("message:new",{sender_id:userId, message:inputValue ,conversation_id:selectedChatId , client_id})
+    const newMessage :ChatMessage= {
+      conversation_id:selectedChatId,
+      id:client_id,
+      text: inputValue ,
+      fileName: selectedFile?.name || null,
+      sender_id: userId,
+      timestamp: new Date().toISOString(),
+      status:"sending"
+    };
+    dispatch(addMessage(newMessage))
    
     setInputValue('');
     setSelectedFile(null);
@@ -148,14 +163,14 @@ const AdminChatUI = () => {
         {/* --- Render Conversation Messages --- */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/20 scrollbar-hide">
           {displayedMessage.map((msg) => (
-            <div key={msg._id} className={`flex ${msg?.sender_id?._id === userId? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[70%] ${msg?.sender_id?._id === userId ? 'flex flex-col items-end' : 'flex gap-3'}`}>
-                {msg?.sender_id?._id === userId && (
+            <div key={msg?.id} className={`flex ${msg?.sender_id === userId? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[70%] ${msg?.sender_id === userId ? 'flex flex-col items-end' : 'flex gap-3'}`}>
+                {msg?.sender_id === userId && (
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold shrink-0">U</div>
                 )}
                 <div>
                   <div className={`p-3 rounded-2xl text-sm shadow-sm ${
-                    msg?.sender_id?._id === userId 
+                    msg?.sender_id === userId 
                     ? 'bg-black text-white rounded-tr-none' 
                     : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'
                   }`}>
@@ -165,11 +180,11 @@ const AdminChatUI = () => {
                         <span className="text-[11px] truncate">{msg.fileName}</span>
                       </div>
                     )} */}
-                    {msg?.message && <p>{msg.message}</p>}
+                    {msg?.text && <p>{msg?.text}</p>}
                   </div>
-                  <div className={`flex items-center gap-1 mt-1 ${msg?.sender_id?._id === userId  ? 'justify-end' : 'justify-start'}`}>
-                    <span className="text-[10px] text-gray-400">{formatChatTime(msg?.createdAt)}</span>
-                    {msg?.sender_id?._id === userId  && (
+                  <div className={`flex items-center gap-1 mt-1 ${msg?.sender_id === userId  ? 'justify-end' : 'justify-start'}`}>
+                    <span className="text-[10px] text-gray-400">{formatChatTime(msg?.timestamp)}</span>
+                    {msg?.sender_id === userId  && (
                       <CheckCheck size={14} className={msg.status === 'seen' ? 'text-blue-500' : 'text-gray-300'} />
                     )}
                   </div>
