@@ -4,6 +4,7 @@ import liveChatApi from "../liveChatAxios.ts"
 import { formatApiResponseMessage } from "@/lib/utils.ts";
 
 
+
 export interface IUser {
   _id: string;
   name: string;
@@ -67,7 +68,7 @@ const initialState: InitialStateType = {
     messages:[]
 };
 
-export const fetchAllConversation = createAsyncThunk("accounts/fetchAllConversation", async (_, { getState, rejectWithValue }) => {
+export const fetchAllConversation = createAsyncThunk("messages/fetchAllConversation", async (_, { getState, rejectWithValue }) => {
 // const state: any = getState();
 
  try {
@@ -83,7 +84,7 @@ export const fetchAllConversation = createAsyncThunk("accounts/fetchAllConversat
 
 })
 
-export const fetchConversationByUserId = createAsyncThunk("accounts/fetchConversationByUserId", async (userId: string, { getState, rejectWithValue }) => {
+export const fetchConversationByUserId = createAsyncThunk("messages/fetchConversationByUserId", async (userId: string, { getState, rejectWithValue }) => {
 
   try {
     const response = await liveChatApi.get(`conversations/get-by-user/${userId}`);
@@ -93,8 +94,19 @@ export const fetchConversationByUserId = createAsyncThunk("accounts/fetchConvers
   }
 
 })
+export const fetchMessagesByConversationId = createAsyncThunk("messages/fetchMessagesByConversationId", async (conversation_id: string, { getState, rejectWithValue }) => {
 
-export const fetchAllMessagesByUserId = createAsyncThunk("accounts/fetchAllMessagesByUserId", async (userId: string, { getState, rejectWithValue }) => {
+  try {
+    const response = await liveChatApi.get(`messages/get-messages/${conversation_id}`);
+    return response?.data?.messages;
+  } catch (error) {
+    return rejectWithValue("Auth check failed");
+  }
+
+})
+
+
+export const fetchAllMessagesByUserId = createAsyncThunk("messages/fetchAllMessagesByUserId", async (userId: string, { getState, rejectWithValue }) => {
 
   try {
     const response = await liveChatApi.get(`messages/get-messages-by-user/${userId}`);
@@ -115,6 +127,12 @@ const MessageSlice = createSlice({
     setMessages(state, action: PayloadAction<ChatMessage[]>) {
       state.messages = action.payload;
     },
+    updateMessage(state,action:PayloadAction<IMessage>){
+      let updatedMessages = state.messages.map(msg => 
+        msg?.id == action.payload.client_id ? formatApiResponseMessage([action.payload])[0] : msg
+      ) 
+      state.messages = updatedMessages 
+    },
     deleteConversation(state, action: PayloadAction<{id:string,isNew:boolean}>) {
        if(action.payload.isNew){
         state.newConversation = state.newConversation.filter(convo => convo._id !== action.payload.id);
@@ -129,6 +147,9 @@ const MessageSlice = createSlice({
     addConversation(state, action: PayloadAction<IConversation>) {
       state.conversations.push(action.payload);
     },
+    addNewConversation(state,action:PayloadAction<IConversation>) {
+      state.newConversation.push(action.payload)
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAllConversation.fulfilled, (state, action) => {
@@ -140,8 +161,11 @@ const MessageSlice = createSlice({
     builder.addCase(fetchAllMessagesByUserId.fulfilled,(state,action) => {
       state.messages = formatApiResponseMessage(action.payload)
     });
+    builder.addCase(fetchMessagesByConversationId.fulfilled,(state,action) => {
+      state.messages = [...state.messages,...formatApiResponseMessage(action.payload)]
+    })
 }});
 
-export const { setConversations,setMessages,deleteConversation,addMessage,addConversation } = MessageSlice.actions;
+export const { setConversations,setMessages,deleteConversation,addMessage,addConversation ,addNewConversation,updateMessage} = MessageSlice.actions;
 
 export default MessageSlice.reducer;
