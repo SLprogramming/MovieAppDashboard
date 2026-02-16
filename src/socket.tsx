@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { io, type Socket } from "socket.io-client";
 
 // single socket instance
-const socket: Socket = io("http://192.168.110.124:8000");
-export const messageSocket: Socket = io("http://192.168.110.124:8080")
+const socket: Socket = io("http://192.168.110.109:8000");
+export const messageSocket: Socket = io("http://192.168.110.109:8080")
 
 // const socket: Socket = io("https://movieappbackend-lc3u.onrender.com");
 export const useAdminSocket = (onNewRequest: (data: any) => void) => {
@@ -28,7 +28,7 @@ export const useMessageSocket = (
   useEffect(() => {
     if (!userId) return;
 
-
+  
     messageSocket.emit("register", { userId, role: "user" });
        messageSocket.emit("register", { role: "admin" });
 

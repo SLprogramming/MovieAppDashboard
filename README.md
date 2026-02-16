@@ -120,6 +120,39 @@ MovieAppDashboard/
 - Delete plans (with appropriate checks)
 - View all active plans
 
+## Real-time Notifications
+
+The dashboard uses Socket.io for real-time purchase request notifications (admin side) and chat messaging (customer service).
+
+- Admin purchase request notifications: see [`useAdminSocket`](src/socket.tsx) in [src/socket.tsx](src/socket.tsx).
+- Customer messaging: see [`useMessageSocket`](src/socket.tsx) and the `messageSocket` instance in [src/socket.tsx](src/socket.tsx).
+
+## Customer Service (Support Chat)
+
+This project includes a customer service / live chat feature for real-time user support:
+
+- Features
+  - Real-time one-to-one messaging between users and admin agents using Socket.io.
+  - Admin chat UI for handling multiple user conversations ([src/pages/AdminChatUI.tsx](src/pages/AdminChatUI.tsx)).
+  - API-backed message persistence and message-related requests via [src/liveChatAxios.ts](src/liveChatAxios.ts).
+  - Automatic socket registration for users and admins using [`useMessageSocket`](src/socket.tsx) and the exported [`messageSocket`](src/socket.tsx).
+
+- Implementation notes
+  - Client socket: the message socket instance is exported as [`messageSocket`](src/socket.tsx). The client registers with the server using `messageSocket.emit("register", { userId, role })`.
+  - Hooks: use [`useMessageSocket`](src/socket.tsx) to register a user session and listen for messages/notifications.
+  - Admin UI: admin-facing chat interface is implemented in [src/pages/AdminChatUI.tsx](src/pages/AdminChatUI.tsx) and connects to the same `messageSocket`.
+  - HTTP: for chat-related REST operations (history, attachments), use [src/liveChatAxios.ts](src/liveChatAxios.ts) to make authenticated calls to the backend.
+
+- How to test locally
+  1. Ensure backend socket/chat server is running and accessible.
+  2. Start the frontend: `npm run dev`.
+  3. Open a user session and an admin session; messages should flow in real-time via [`messageSocket`](src/socket.tsx).
+
+- Files & symbols
+  - Chat socket and hooks: [`useMessageSocket`](src/socket.tsx), [`messageSocket`](src/socket.tsx) — [src/socket.tsx](src/socket.tsx)
+  - Admin chat page: [src/pages/AdminChatUI.tsx](src/pages/AdminChatUI.tsx)
+  - Chat API client: [src/liveChatAxios.ts](src/liveChatAxios.ts)
+
 ### Purchase Request Processing
 - Review pending premium purchase requests
 - View payment proof images uploaded by users
