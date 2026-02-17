@@ -7,6 +7,7 @@ import {
   CheckCheck,
   FileText,
   X,
+  Check,
 } from "lucide-react";
 import { messageSocket } from "../socket.tsx";
 import {
@@ -20,6 +21,8 @@ import {
   updateMessage,
   addNewConversation,
   type ChatMessage,
+  type MessageStatus,
+  updateMessageWithId,
 } from "../reducer/message.reducer.ts";
 import { useStoreDispatch, useStoreSelector } from "@/store/store.ts";
 import {
@@ -27,11 +30,12 @@ import {
   formatChatTime,
   generateUniqueId,
 } from "@/lib/utils.ts";
+import { useMessageObserver } from "@/hooks/useMessageObserver.ts";
 
 type LastMessage = {
-  id:string,
-  text:string,
-}
+  id: string;
+  text: string;
+};
 
 const AdminChatUI = () => {
   const { newConversation, conversations, messages } = useStoreSelector(
@@ -56,32 +60,28 @@ const AdminChatUI = () => {
       ?.request_user_id;
   }, [selectedChatId, conversations]);
 
-  const lastMessageByConversationId  = useMemo(() => {
-    let allConversation = [...conversations,...newConversation]
+  const lastMessageByConversationId = useMemo(() => {
+    let allConversation = [...conversations, ...newConversation];
     let lastMessages = allConversation.map((conv) => {
-      let convMessages = messages.filter(e=>e.conversation_id == conv?._id)
-      if(convMessages.length == 0){
+      let convMessages = messages.filter((e) => e.conversation_id == conv?._id);
+      if (convMessages.length == 0) {
         return {
-          id:conv?._id,
-          text:conv?.lastMessage
-        }
-      }else{
-       let last = convMessages.reduce((latest, curr) =>
-      new Date(curr.timestamp) > new Date(latest.timestamp)
-        ? curr
-        : latest
-    )
+          id: conv?._id,
+          text: conv?.lastMessage,
+        };
+      } else {
+        let last = convMessages.reduce((latest, curr) =>
+          new Date(curr.timestamp) > new Date(latest.timestamp) ? curr : latest,
+        );
 
-    return {
-      id:conv?._id,
-      text:last?.text
-    }
+        return {
+          id: conv?._id,
+          text: last?.text,
+        };
       }
-    })
-    return lastMessages as LastMessage[]
-  },[conversations,newConversation,messages])
-
-
+    });
+    return lastMessages as LastMessage[];
+  }, [conversations, newConversation, messages]);
 
   // Auto-scroll logic
   useEffect(() => {
@@ -98,9 +98,12 @@ const AdminChatUI = () => {
         dispatch(addMessage(e));
       });
     });
-    messageSocket.on("message:saved",(data:any) => {
-      dispatch(updateMessage(data))
-    })
+    messageSocket.on("message:saved", (data: any) => {
+      dispatch(updateMessage(data));
+    });
+    messageSocket.on("message:statusChanged", (data: any) => {
+      dispatch(updateMessageWithId(data));
+    });
     messageSocket.on("conversation:new", (data: any) => {
       console.log("New conversation:", data);
       dispatch(addConversation(data));
@@ -122,6 +125,22 @@ const AdminChatUI = () => {
       messageSocket.off("pendingConversation:new");
     };
   }, []);
+
+  const handleMessageStatusChange = ({
+    message_id,
+    status,
+    sender_id,
+  }: {
+    message_id: string;
+    status: MessageStatus;
+    sender_id: string;
+  }) => {
+    messageSocket.emit("message:statusChange", {
+      sender_id: sender_id,
+      status,
+      id: message_id,
+    });
+  };
 
   const takeConversation = (id: string) => {
     console.log("Taking conversation with ID:", id);
@@ -158,6 +177,8 @@ const AdminChatUI = () => {
     setInputValue("");
     setSelectedFile(null);
   };
+
+  const { setRef } = useMessageObserver(userId, handleMessageStatusChange);
 
   return (
     <div className="flex h-[90vh] w-full bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
@@ -204,7 +225,10 @@ const AdminChatUI = () => {
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 truncate">
-                   {lastMessageByConversationId.find(e=>e.id == chat?._id)?.text}
+                  {
+                    lastMessageByConversationId.find((e) => e.id == chat?._id)
+                      ?.text
+                  }
                 </p>
               </div>
             </button>
@@ -234,7 +258,10 @@ const AdminChatUI = () => {
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 truncate">
-                  {lastMessageByConversationId.find(e=>e.id == chat?._id)?.text}
+                  {
+                    lastMessageByConversationId.find((e) => e.id == chat?._id)
+                      ?.text
+                  }
                 </p>
               </div>
             </button>
@@ -266,7 +293,11 @@ const AdminChatUI = () => {
           {displayedMessage.map((msg) => (
             <div
               key={msg?.id}
-              className={`flex ${msg?.sender_id === userId ? "justify-end" : "justify-start"}`}
+              ref={setRef}
+              className={` flex ${msg?.sender_id === userId ? "justify-end" : "justify-start"}`}
+              data-id={msg?.id}
+              data-sender={msg?.sender_id}
+              data-status={msg?.status}
             >
               <div
                 className={`max-w-[70%] ${msg?.sender_id === userId ? "flex flex-col items-end" : "flex gap-3"}`}
@@ -299,14 +330,15 @@ const AdminChatUI = () => {
                       {formatChatTime(msg?.timestamp)}
                     </span>
                     {msg?.sender_id === userId && (
-                      <CheckCheck
-                        size={14}
-                        className={
-                          msg.status === "seen"
-                            ? "text-blue-500"
-                            : "text-gray-300"
-                        }
-                      />
+                      <span className="ml-1">
+                        {msg.status === "seen" ? (
+                          <CheckCheck className="w-3 h-3 text-blue-500" /> // Double blue check
+                        ) : msg.status === "sent" ? (
+                          <CheckCheck className="w-3 h-3 " /> // Double gray check
+                        ) : (
+                          <Check className="w-3 h-3" /> // Single gray check (sent)
+                        )}
+                      </span>
                     )}
                   </div>
                 </div>

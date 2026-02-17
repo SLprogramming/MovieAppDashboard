@@ -133,6 +133,12 @@ const MessageSlice = createSlice({
       ) 
       state.messages = updatedMessages 
     },
+    updateMessageWithId(state,action:PayloadAction<IMessage>){
+      let updatedMessages = state.messages.map(msg => 
+        msg?.id == action.payload._id ? formatApiResponseMessage([action.payload])[0] : msg
+      ) 
+      state.messages = updatedMessages 
+    },
     deleteConversation(state, action: PayloadAction<{id:string,isNew:boolean}>) {
        if(action.payload.isNew){
         state.newConversation = state.newConversation.filter(convo => convo._id !== action.payload.id);
@@ -166,6 +172,6 @@ const MessageSlice = createSlice({
     })
 }});
 
-export const { setConversations,setMessages,deleteConversation,addMessage,addConversation ,addNewConversation,updateMessage} = MessageSlice.actions;
+export const { setConversations,setMessages,deleteConversation,addMessage,addConversation ,addNewConversation,updateMessage,updateMessageWithId} = MessageSlice.actions;
 
 export default MessageSlice.reducer;
